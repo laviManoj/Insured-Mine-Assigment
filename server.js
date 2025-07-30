@@ -4,13 +4,13 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
-const connectDB = require('./config/database');
-const errorHandler = require('./middleware/errorHandler');
+const connectDB = require('./config/db');
+// const errorHandler = require('./middleware/errorHandler');
 
-const agentRoutes = require('./routes/agentRoutes');
-const userRoutes = require('./routes/userRoutes');
-const policyRoutes = require('./routes/policyRoutes');
-const uploadRoutes = require('./routes/uploadRoutes');
+// const agentRoutes = require('./routes/agentRoutes');
+// const userRoutes = require('./routes/userRoutes');
+// const policyRoutes = require('./routes/policyRoutes');
+// const uploadRoutes = require('./routes/uploadRoutes');
 
 const app = express();
 
@@ -31,10 +31,10 @@ app.use(express.json({ limit: process.env.UPLOAD_LIMIT || '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: process.env.UPLOAD_LIMIT || '10mb' }));
 
 // Routes
-app.use('/api/agents', agentRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/policies', policyRoutes);
-app.use('/api/upload', uploadRoutes);
+// app.use('/api/agents', agentRoutes);
+// app.use('/api/users', userRoutes);
+// app.use('/api/policies', policyRoutes);
+// app.use('/api/upload', uploadRoutes);
 
 
 app.get('/health', (req, res) => {
@@ -60,7 +60,7 @@ app.get('/', (req, res) => {
 });
 
 
-app.use(errorHandler);
+// app.use(errorHandler);
 
 // Handle 404
 app.use('*', (req, res) => {
