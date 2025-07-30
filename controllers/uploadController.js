@@ -16,7 +16,7 @@ const storage = multer.diskStorage({
 const fileFilter = (req, file, cb) => {
   const allowedTypes = ['.xlsx', '.xls', '.csv'];
   const ext = path.extname(file.originalname).toLowerCase();
-  
+
   if (allowedTypes.includes(ext)) {
     cb(null, true);
   } else {
@@ -35,6 +35,11 @@ const upload = multer({
 class UploadController {
   constructor() {
     this.uploadMiddleware = upload.single('file');
+
+    // Bind methods
+    this.uploadCsv = this.uploadCsv.bind(this);
+    this.uploadXlsx = this.uploadXlsx.bind(this);
+    this.getUploadStatus = this.getUploadStatus.bind(this);
   }
 
   async uploadXlsx(req, res, next) {
@@ -57,10 +62,7 @@ class UploadController {
         const filePath = req.file.path;
         const fileType = path.extname(req.file.originalname).slice(1).toLowerCase();
 
-        // Validate file
         await uploadService.validateFile(filePath, ['.xlsx', '.xls']);
-
-        // Process file using worker thread
         const result = await uploadService.processFile(filePath, fileType);
 
         if (result.success) {
@@ -78,7 +80,6 @@ class UploadController {
         }
 
       } catch (error) {
-        // Clean up file if error occurs
         if (req.file) {
           await uploadService.cleanupFile(req.file.path);
         }
@@ -107,10 +108,7 @@ class UploadController {
         const filePath = req.file.path;
         const fileType = 'csv';
 
-        // Validate file
         await uploadService.validateFile(filePath, ['.csv']);
-
-        // Process file using worker thread
         const result = await uploadService.processFile(filePath, fileType);
 
         if (result.success) {
@@ -128,7 +126,6 @@ class UploadController {
         }
 
       } catch (error) {
-        // Clean up file if error occurs
         if (req.file) {
           await uploadService.cleanupFile(req.file.path);
         }
