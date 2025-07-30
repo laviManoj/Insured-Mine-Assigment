@@ -67,3 +67,25 @@ const policySchema = new mongoose.Schema({
 }, {
   timestamps: true
 });
+
+policySchema.index({ policyNumber: 1 });
+policySchema.index({ userId: 1 });
+policySchema.index({ categoryId: 1 });
+policySchema.index({ carrierId: 1 });
+policySchema.index({ policyStartDate: 1, policyEndDate: 1 });
+policySchema.index({ status: 1 });
+
+// Virtual for policy duration
+policySchema.virtual('policyDuration').get(function() {
+  return Math.ceil((this.policyEndDate - this.policyStartDate) / (1000 * 60 * 60 * 24));
+});
+
+// Check if policy is currently active
+policySchema.virtual('isCurrentlyActive').get(function() {
+  const now = new Date();
+  return this.status === 'Active' && 
+         this.policyStartDate <= now && 
+         this.policyEndDate >= now;
+});
+
+module.exports = mongoose.model('Policy', policySchema);
