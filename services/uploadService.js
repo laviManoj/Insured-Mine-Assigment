@@ -59,7 +59,6 @@ class UploadService {
 
   async getUploadStats() {
     try {
-      // This could be extended to track upload statistics
       return {
         message: 'Upload service is operational',
         timestamp: new Date().toISOString()

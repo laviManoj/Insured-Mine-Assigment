@@ -31,12 +31,10 @@ policySchema.index({ carrierId: 1 });
 policySchema.index({ policyStartDate: 1, policyEndDate: 1 });
 policySchema.index({ status: 1 });
 
-// Virtual for policy duration
 policySchema.virtual('policyDuration').get(function() {
   return Math.ceil((this.policyEndDate - this.policyStartDate) / (1000 * 60 * 60 * 24));
 });
 
-// Check if policy is currently active
 policySchema.virtual('isCurrentlyActive').get(function() {
   const now = new Date();
   return this.status === 'Active' && 

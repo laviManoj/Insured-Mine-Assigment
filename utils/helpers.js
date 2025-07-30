@@ -1,16 +1,13 @@
 const moment = require('moment');
 
 class Helpers {
-  // Format date to a specific format
   static formatDate(date, format = 'YYYY-MM-DD') {
     return moment(date).format(format);
   }
 
-  // Parse date from various formats
   static parseDate(dateString) {
     if (!dateString) return null;
     
-    // Try different date formats
     const formats = [
       'MM/DD/YYYY',
       'DD/MM/YYYY',
@@ -27,12 +24,10 @@ class Helpers {
       }
     }
 
-    // Fallback to default parsing
     const date = new Date(dateString);
     return isNaN(date.getTime()) ? null : date;
   }
 
-  // Format currency
   static formatCurrency(amount, currency = 'USD') {
     if (typeof amount !== 'number') return '$0.00';
     
@@ -42,36 +37,30 @@ class Helpers {
     }).format(amount);
   }
 
-  // Parse currency string to number
   static parseCurrency(currencyString) {
     if (!currencyString) return 0;
     
-    // Remove currency symbols and commas
     const cleaned = currencyString.toString().replace(/[$,\s]/g, '');
     const number = parseFloat(cleaned);
     return isNaN(number) ? 0 : number;
   }
 
-  // Generate unique identifier
   static generateId(prefix = '') {
     const timestamp = Date.now().toString(36);
     const randomStr = Math.random().toString(36).substr(2, 9);
     return `${prefix}${timestamp}${randomStr}`.toUpperCase();
   }
 
-  // Validate email format
   static isValidEmail(email) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   }
 
-  // Validate phone number (US format)
   static isValidPhoneNumber(phone) {
     const phoneRegex = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
     return phoneRegex.test(phone);
   }
 
-  // Format phone number
   static formatPhoneNumber(phone) {
     if (!phone) return '';
     
@@ -85,7 +74,6 @@ class Helpers {
     return phone;
   }
 
-  // Capitalize first letter of each word
   static titleCase(str) {
     if (!str) return '';
     
@@ -94,19 +82,16 @@ class Helpers {
     });
   }
 
-  // Deep clone object
   static deepClone(obj) {
     return JSON.parse(JSON.stringify(obj));
   }
 
-  // Check if object is empty
   static isEmpty(obj) {
     if (obj == null) return true;
     if (Array.isArray(obj) || typeof obj === 'string') return obj.length === 0;
     return Object.keys(obj).length === 0;
   }
 
-  // Remove null and undefined values from object
   static removeNullValues(obj) {
     const result = {};
     for (const key in obj) {
@@ -124,7 +109,6 @@ class Helpers {
     return result;
   }
 
-  // Calculate age from date of birth
   static calculateAge(dateOfBirth) {
     if (!dateOfBirth) return null;
     
@@ -140,7 +124,6 @@ class Helpers {
     return age;
   }
 
-  // Check if policy is currently active
   static isPolicyActive(startDate, endDate, status = 'Active') {
     if (status !== 'Active') return false;
     
@@ -151,7 +134,6 @@ class Helpers {
     return start <= now && now <= end;
   }
 
-  // Calculate policy duration in days
   static calculatePolicyDuration(startDate, endDate) {
     if (!startDate || !endDate) return 0;
     
@@ -163,7 +145,6 @@ class Helpers {
     return diffDays;
   }
 
-  // Generate policy number
   static generatePolicyNumber(prefix = 'POL', carrierId = '') {
     const date = new Date();
     const year = date.getFullYear();
@@ -174,7 +155,6 @@ class Helpers {
     return `${prefix}${carrierId.slice(0, 3).toUpperCase()}${year}${month}${timestamp}${random}`;
   }
 
-  // Paginate array
   static paginate(array, page = 1, limit = 10) {
     const startIndex = (page - 1) * limit;
     const endIndex = startIndex + limit;
@@ -192,7 +172,6 @@ class Helpers {
     };
   }
 
-  // Sort array of objects by property
   static sortByProperty(array, property, direction = 'asc') {
     return array.sort((a, b) => {
       const aVal = a[property];
@@ -206,7 +185,6 @@ class Helpers {
     });
   }
 
-  // Group array by property
   static groupBy(array, property) {
     return array.reduce((groups, item) => {
       const key = item[property];
@@ -216,7 +194,6 @@ class Helpers {
     }, {});
   }
 
-  // Generate random string
   static generateRandomString(length = 10) {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let result = '';
@@ -226,13 +203,11 @@ class Helpers {
     return result;
   }
 
-  // Validate MongoDB ObjectId
   static isValidObjectId(id) {
     const mongoose = require('mongoose');
     return mongoose.Types.ObjectId.isValid(id);
   }
 
-  // Create response object
   static createResponse(success, message, data = null, pagination = null) {
     const response = {
       success,
@@ -251,7 +226,6 @@ class Helpers {
     return response;
   }
 
-  // Log request details
   static logRequest(req) {
     console.log(`${new Date().toISOString()} - ${req.method} ${req.originalUrl}`, {
       ip: req.ip,
@@ -260,7 +234,6 @@ class Helpers {
     });
   }
 
-  // Sanitize string for database
   static sanitizeString(str) {
     if (typeof str !== 'string') return str;
     
@@ -271,7 +244,6 @@ class Helpers {
       .replace(/on\w+=/gi, ''); // Remove event handlers
   }
 
-  // Convert file size to human readable format
   static formatFileSize(bytes) {
     if (bytes === 0) return '0 Bytes';
     

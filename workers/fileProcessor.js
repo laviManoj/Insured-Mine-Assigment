@@ -5,7 +5,6 @@ const fs = require('fs');
 const mongoose = require('mongoose');
 const path = require('path');
 
-// Create models
 const Agent = require("../models/Agent")
 const User = require("../models/User")
 const UserAccount = require("../models/UserAccount")
@@ -111,7 +110,6 @@ class FileProcessor {
       }
     }
 
-    // Convert Sets to numbers for final summary
     results.summary.agents = results.processedIds.agentIds.size;
     results.summary.users = results.processedIds.userIds.size;
     results.summary.userAccounts = results.processedIds.accountIds.size;
@@ -124,7 +122,6 @@ class FileProcessor {
 
   async processRow(row, results, rowNumber) {
     try {
-      // Process Agent
       let agent = null;
       const agentName = row.agent || row.Agent || '';
       if (agentName && agentName.trim()) {
@@ -134,7 +131,6 @@ class FileProcessor {
         }
       }
 
-      // Process User - Map your CSV columns to user fields
       const userData = {
         firstName: row.firstname || row.firstName || row.first_name || '',
         lastName: '', // Not in your CSV, can be empty
@@ -153,7 +149,6 @@ class FileProcessor {
         userType: this.normalizeUserType(row.userType || row.account_type || 'Individual')
       };
 
-      // Validate required fields
       if (!userData.firstName.trim()) {
         userData.firstName = `User${rowNumber}`;
       }
@@ -166,7 +161,6 @@ class FileProcessor {
         results.processedIds.userIds.add(user._id.toString());
       }
 
-      // Process User Account
       let userAccount = null;
       const accountName = row.account_name || row.accountName || `${userData.firstName}'s Account`;
       if (accountName && accountName.trim()) {
@@ -176,21 +170,18 @@ class FileProcessor {
         }
       }
 
-      // Process Policy Category
       const categoryName = row.category_name || row.categoryName || row.policy_type || 'General Insurance';
       const policyCategory = await this.findOrCreatePolicyCategory(categoryName);
       if (policyCategory) {
         results.processedIds.categoryIds.add(policyCategory._id.toString());
       }
 
-      // Process Policy Carrier
       const companyName = row.company_name || row.companyName || row.carrier || 'Unknown Carrier';
       const policyCarrier = await this.findOrCreatePolicyCarrier(companyName);
       if (policyCarrier) {
         results.processedIds.carrierIds.add(policyCarrier._id.toString());
       }
 
-      // Process Policy
       const policyData = {
         policyNumber: row.policy_number || row.policyNumber || this.generatePolicyNumber(),
         policyStartDate: this.parseDate(row.policy_start_date || row.policyStartDate) || new Date(),
@@ -212,7 +203,6 @@ class FileProcessor {
         hasActiveClientPolicy: this.parseBoolean(row.hasActive || row.ClientPolicy)
       };
 
-      // Check if policy already exists
       const existingPolicy = await Policy.findOne({ policyNumber: policyData.policyNumber });
       if (!existingPolicy) {
         const newPolicy = new Policy(policyData);
@@ -254,7 +244,6 @@ class FileProcessor {
       return user;
     } catch (error) {
       console.error(`Error with user ${userData.email}:`, error.message);
-      // If validation fails, try with minimal data
       try {
         const minimalUserData = {
           firstName: userData.firstName || 'Unknown',
@@ -325,13 +314,11 @@ class FileProcessor {
   parseDate(dateString) {
     if (!dateString) return null;
     
-    // Handle various date formats
     const date = new Date(dateString);
     if (!isNaN(date.getTime())) {
       return date;
     }
 
-    // Try parsing MM/DD/YYYY format
     const parts = dateString.toString().split('/');
     if (parts.length === 3) {
       const month = parseInt(parts[0]) - 1; // Month is 0-indexed
@@ -340,7 +327,6 @@ class FileProcessor {
       return new Date(year, month, day);
     }
 
-    // Try parsing YYYY-MM-DD format
     const dashParts = dateString.toString().split('-');
     if (dashParts.length === 3) {
       return new Date(dashParts[0], dashParts[1] - 1, dashParts[2]);
@@ -352,7 +338,6 @@ class FileProcessor {
   parseNumber(numberString) {
     if (!numberString) return 0;
     
-    // Remove currency symbols and commas
     const cleaned = numberString.toString().replace(/[$,\s]/g, '');
     const number = parseFloat(cleaned);
     return isNaN(number) ? 0 : number;
@@ -390,7 +375,6 @@ class FileProcessor {
   }
 }
 
-// Main worker execution
 async function processFile() {
   try {
     const { filePath, fileType } = workerData;
@@ -398,7 +382,6 @@ async function processFile() {
     
     const processor = new FileProcessor();
     
-    // Wait for DB connection
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     let result;
@@ -410,7 +393,6 @@ async function processFile() {
       throw new Error('Unsupported file type');
     }
 
-    // Clean up the processed file
     try {
       fs.unlinkSync(filePath);
       console.log('File cleaned up successfully');

@@ -2,7 +2,6 @@ const uploadService = require('../services/uploadService');
 const multer = require('multer');
 const path = require('path');
 
-// Configure multer for file uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, 'uploads/');
@@ -27,7 +26,7 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({
   storage: storage,
   limits: {
-    fileSize: 10 * 1024 * 1024 // 10MB limit
+    fileSize: 10 * 1024 * 1024 
   },
   fileFilter: fileFilter
 });
@@ -36,7 +35,6 @@ class UploadController {
   constructor() {
     this.uploadMiddleware = upload.single('file');
 
-    // Bind methods
     this.uploadCsv = this.uploadCsv.bind(this);
     this.uploadXlsx = this.uploadXlsx.bind(this);
     this.getUploadStatus = this.getUploadStatus.bind(this);

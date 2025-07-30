@@ -1,6 +1,5 @@
 const Joi = require('joi');
 
-// Agent validation schema
 const agentSchema = Joi.object({
   agentName: Joi.string().trim().max(100).required(),
   agentId: Joi.string().trim().optional(),
@@ -10,7 +9,6 @@ const agentSchema = Joi.object({
   isActive: Joi.boolean().optional()
 });
 
-// User validation schema
 const userSchema = Joi.object({
   firstName: Joi.string().trim().max(50).required(),
   lastName: Joi.string().trim().max(50).optional(),
@@ -31,7 +29,6 @@ const userSchema = Joi.object({
   isActive: Joi.boolean().optional()
 });
 
-// Policy validation schema
 const policySchema = Joi.object({
   policyNumber: Joi.string().trim().required(),
   policyStartDate: Joi.date().required(),
@@ -49,7 +46,6 @@ const policySchema = Joi.object({
   isActive: Joi.boolean().optional()
 });
 
-// Validation middleware functions
 const validateAgent = (req, res, next) => {
   const { error } = agentSchema.validate(req.body);
   if (error) {
@@ -86,7 +82,6 @@ const validatePolicy = (req, res, next) => {
   next();
 };
 
-// Generic validation middleware
 const validate = (schema) => {
   return (req, res, next) => {
     const { error } = schema.validate(req.body);

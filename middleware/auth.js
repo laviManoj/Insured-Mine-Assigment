@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken');
 
-// Authentication middleware (if needed in the future)
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
@@ -24,7 +23,6 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-// Role-based authorization middleware
 const authorizeRoles = (...roles) => {
   return (req, res, next) => {
     if (!req.user) {
@@ -45,7 +43,6 @@ const authorizeRoles = (...roles) => {
   };
 };
 
-// API key validation middleware (alternative to JWT)
 const validateApiKey = (req, res, next) => {
   const apiKey = req.headers['x-api-key'];
 
@@ -56,7 +53,6 @@ const validateApiKey = (req, res, next) => {
     });
   }
 
-  // In production, validate against database or environment variable
   const validApiKeys = process.env.VALID_API_KEYS?.split(',') || [];
   
   if (!validApiKeys.includes(apiKey)) {
