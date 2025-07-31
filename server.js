@@ -6,32 +6,25 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 
 const connectDB = require('./config/db');
-// const errorHandler = require('./middleware/errorHandler');
 
-// Import existing routes
 const agentRoutes = require('./routes/agentRoutes');
 const userRoutes = require('./routes/userRoutes');
 const policyRoutes = require('./routes/policyRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
 
-// Import new modules for Task 2
 const CPUMonitor = require('./cpuMonitor');
 const SchedulerService = require('./schedulerService');
 
 const app = express();
 
-// Global variables for Task 2
 let cpuMonitor;
 let schedulerService;
 let db;
 
-// Initialize database and new services
 async function initializeServices() {
   try {
-    // Connect to database
     await connectDB();
     
-    // Get database instance from mongoose connection
     db = mongoose.connection.db;
     
     if (!db) {
@@ -40,21 +33,16 @@ async function initializeServices() {
     
     console.log('📊 Database instance obtained for Task 2 services');
 
-    // Add small delay to ensure connection is ready
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    // Initialize CPU Monitor with 70% threshold
     cpuMonitor = new CPUMonitor(70, 5000); // 70% threshold, check every 5 seconds
     
-    // Initialize Scheduler Service
     schedulerService = new SchedulerService(db);
 
-    // Start CPU monitoring with custom restart callback
     cpuMonitor.startMonitoring((cpuUsage) => {
       console.log(`🚨 High CPU usage detected: ${cpuUsage.toFixed(2)}%`);
       console.log('🔄 Performing graceful shutdown...');
       
-      // Graceful shutdown
       setTimeout(() => {
         process.exit(1);
       }, 2000);
@@ -66,14 +54,11 @@ async function initializeServices() {
 
   } catch (error) {
     console.error('❌ Error initializing Task 2 services:', error);
-    // Don't exit - let the app run without Task 2 features if there's an issue
   }
 }
 
-// Initialize services
 initializeServices();
 
-// Existing middleware
 app.use(helmet());
 app.use(cors());
 
@@ -93,9 +78,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/policies', policyRoutes);
 app.use('/api/upload', uploadRoutes);
 
-// NEW ROUTES FOR TASK 2
 
-// CPU Monitoring Routes
 app.get('/api/system/cpu', async (req, res) => {
   try {
     if (!cpuMonitor) {
@@ -303,8 +286,7 @@ app.get('/', (req, res) => {
   });
 });
 
-// Existing error handling
-// app.use(errorHandler);
+
 
 // Handle 404
 app.use('*', (req, res) => {
@@ -314,7 +296,6 @@ app.use('*', (req, res) => {
   });
 });
 
-// Graceful shutdown handlers for Task 2
 process.on('SIGTERM', async () => {
   console.log('🛑 SIGTERM received. Shutting down gracefully...');
   
@@ -322,7 +303,6 @@ process.on('SIGTERM', async () => {
     cpuMonitor.stopMonitoring();
   }
   
-  // Add any database cleanup if needed
   process.exit(0);
 });
 
@@ -333,7 +313,6 @@ process.on('SIGINT', async () => {
     cpuMonitor.stopMonitoring();
   }
   
-  // Add any database cleanup if needed
   process.exit(0);
 });
 
